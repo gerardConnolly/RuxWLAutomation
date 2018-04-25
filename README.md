@@ -1,5 +1,3 @@
-# RuxWLAutomation
-Python script to automate RUX GA and SQL querying and Excel formatting
 import pandas as pd
 import numpy as np
 
@@ -13,6 +11,8 @@ from SQL.Query import Query
 from GA.GA_obj import GA
 
 import openpyxl
+from openpyxl.styles import colors
+from openpyxl.styles import Font, Color, Border
 
 def find_row(sheet):
     row = 1
@@ -78,19 +78,20 @@ __LAST_MONDAY__
 #---------------------------------------------------------------------------------------------------------------
 #formatting Variables
 
-percent_format = "##%"
+percent_format = "##.##%"
 
 
 
 
 #---------------------------------------------------------------------------------------------------------------
 #set excel file variable to correct path and define the sheet variable
-RuxWishList = openpyxl.load_workbook('/Users/gconnolly/Documents/projects/RUX/RUX_automated.xlsx')
+RuxWishList = openpyxl.load_workbook('/Users/gconnolly/Documents/projects/RUX/test.xlsx')
 #RuxWishList = openpyxl.load_workbook('/Volumes/ugcompanystorage/Company/public/Analytics/Nikita/RUX_automated.xlsx')
 
 
 Wish_list = RuxWishList.get_sheet_by_name('Wish_List')
 empty_row = find_row(Wish_list)
+
 #---------------------------------------------------------------------------------------------------------------
 #Calculate th date/week and add it to column 1
 col = 1
@@ -98,15 +99,16 @@ year = datetime.date.today().year
 end_date = datetime.date.today()
 week = end_date.isocalendar()[1] - 1
 Wish_list.cell(row = empty_row, column = col).value = week
-(Wish_list.cell(row = empty_row, column = col)).value = ("{}{}".format(year,week))
-Wish_list.cell(row = empty_row, column = col).number_format = '######'
+(Wish_list.cell(row = empty_row, column = col)).value = int("{}{}".format(year,week))
+Wish_list.cell(row = empty_row, column = col).number_format = '#'
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 
 #---------------------------------------------------------------------------------------------------------------
 #Add the date range for the querys to follow into the excel sheet
 col = col + 1
 
-(Wish_list.cell(row = empty_row, column = col)).value = ("{} To {}".format(__LAST_MONDAY__.strftime('%m-%d-%Y'), __LAST_SUNDAY__.strftime('%m-%d-%Y')))
-
+(Wish_list.cell(row = empty_row, column = col)).value = ("{} to {}, {}".format(__LAST_MONDAY__.strftime('%b %d'), __LAST_SUNDAY__.strftime('%b %d'), __LAST_SUNDAY__.strftime('%Y')))
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 
 
 #---------------------------------------------------------------------------------------------------------------
@@ -131,7 +133,7 @@ print('\n1. Number of users that visit basket: '+ str(int(users_accessed)))
 
 (Wish_list.cell(row=empty_row, column=col)).value = int(users_accessed)
 Wish_list.cell(row=empty_row, column=col).number_format = '#,##0'
-
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 
 
 
@@ -154,7 +156,7 @@ print('\n1. GA QUERY Lists Viewed: '+ str(lists_viewed))
 
 (Wish_list.cell (row=empty_row, column=col)).value = int(lists_viewed)
 Wish_list.cell(row = empty_row, column=col).number_format = '#,##0'
-
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 
 
 
@@ -182,8 +184,8 @@ users_added = users_added_df.iloc[0][0]
 users_added
 print('\n2. Number of users that added a wishlist: ' + str(int(users_added)))
 (Wish_list.cell(row=empty_row, column = col)).value = int(users_added)
-Wish_list.cell(row=empty_row, column=col).number_format = '#,##0'
-
+Wish_list.cell(row=empty_row, column=col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 
 
 
@@ -214,8 +216,8 @@ users_added_to_loves
 print('\n3. Number of users that added loves: ' + str(int(users_added_to_loves)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(users_added_to_loves)
-Wish_list.cell(row=empty_row, column=col).number_format = '#,##0'
-
+Wish_list.cell(row=empty_row, column=col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column G
@@ -230,7 +232,7 @@ formula_cell = (Wish_list.cell(row=previous_row, column=col)).value
 #(Wish_list.cell(row = empty_row, column = col)).value = str(formula_cell)
 (Wish_list.cell(row = empty_row, column = col)).value = "=F{}/F{}-1".format(empty_row,one_year_ago)
 Wish_list.cell(row = empty_row, column = col).number_format = '##%'
-
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column H
 col = col + 1
@@ -256,8 +258,8 @@ users_added_to_lists
 print('\n4. Number of users that added lists: ' + str(int(users_added_to_lists)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(users_added_to_lists)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
-
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column I
@@ -266,13 +268,15 @@ col = col + 1
 previous_row= empty_row - 1
 one_year_ago = empty_row -53
 (Wish_list.cell(row = empty_row, column = col)).value = "=H{}/H{}-1".format(empty_row, one_year_ago)
-Wish_list.cell(row = empty_row, column = col).number_format = '##%'
+Wish_list.cell(row = empty_row, column = col).number_format = percent_format
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column J (hybrid users)
 col = col + 1
 
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR(((F{}+H{})-E{})/E{},\"\")".format(empty_row,empty_row,empty_row,empty_row)
 Wish_list.cell(row = empty_row, column = col).number_format = '##%'
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #Column K
 
@@ -302,28 +306,33 @@ new_users_adding
 print('\n5. Number of new users added: ' + str(int(new_users_adding)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(new_users_adding)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column (returning users added Column L )
 col = col + 1
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR(E{}-K{},\"\")".format(empty_row,empty_row)
-#Wish_list.cell(row = empty_row, column = col).number_format = '##%'
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column (returning user growth Column M)
 col = col + 1
 (Wish_list.cell(row = empty_row, column = col)).value = "=L{}/L{}-1".format(empty_row, one_year_ago)
 Wish_list.cell(row = empty_row, column = col).number_format = '##%'
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column (new user growth column N)
 col = col + 1
 
 (Wish_list.cell(row = empty_row, column = col)).value = "=K{}/K{}-1".format(empty_row, one_year_ago)
 Wish_list.cell(row = empty_row, column = col).number_format = '##%'
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column (returning % Column O)
 col = col + 1
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR(L{}/E{},\"\")".format(empty_row,empty_row)
 Wish_list.cell(row = empty_row, column =col).number_format = '##%'
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column P
 col = col + 1
@@ -350,27 +359,32 @@ new_user_loves
 print('\n6. Number of New Users Added To Loves: ' + str(int(new_user_loves)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(new_user_loves)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column Q (unnamed)
 col = col + 1
 (Wish_list.cell(row = empty_row, column = col)).value = "=P{}/P{}-1".format(empty_row, one_year_ago)
 Wish_list.cell(row = empty_row, column = col).number_format = '##%'
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column R (ret user loves)
 col = col + 1
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR(F{}-P{},\"\")".format(empty_row,empty_row)
-Wish_list.cell(row = empty_row, column =col).number_format = '#########'
+Wish_list.cell(row = empty_row, column =col).number_format = '######### '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column S(loves new user growth)
 col = col + 1
 (Wish_list.cell(row = empty_row, column = col)).value = "=P{}/P{}-1".format(empty_row, one_year_ago)
 Wish_list.cell(row = empty_row, column = col).number_format = '##%'
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column T(loves ret user growth)
 col = col + 1
 (Wish_list.cell(row = empty_row, column = col)).value = "=R{}/R{}-1".format(empty_row, one_year_ago)
 Wish_list.cell(row = empty_row, column = col).number_format = '##%'
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #New User Lists Column U
 col = col + 1
@@ -397,24 +411,28 @@ new_users_lists
 print('\n7. Number of New Users list added: ' + str(int(new_users_lists)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(new_users_lists)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column V ( new users list growth )
 col = col + 1
 (Wish_list.cell(row = empty_row, column = col)).value = "=U{}/U{}-1".format(empty_row, one_year_ago)
-Wish_list.cell(row = empty_row, column = col).number_format = '##%'
+Wish_list.cell(row = empty_row, column = col).number_format = percent_format
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column W ( % of lovers that are returning )
 col = col + 1
 
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR((F{}-P{})/F{},\"\")".format(empty_row, empty_row, empty_row)
 Wish_list.cell(row = empty_row, column = col).number_format = percent_format
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column X ( % of listers that are returning )
 col = col + 1
 
 (Wish_list.cell(row = empty_row, column =  col)).value = "=IFERROR((H{}-U{})/H{},"")".format(empty_row, empty_row, empty_row)
 Wish_list.cell(row = empty_row, column = col).number_format = percent_format
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #Column Y
 col = col + 1
@@ -459,7 +477,8 @@ users_adding_dupe_skus
 print('\n8. Users Adding Dupe SKUs: ' + str(int(users_adding_dupe_skus)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(users_adding_dupe_skus)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column Z ( #percent returning, there is no calculation in here )
 col = col + 1
@@ -472,7 +491,7 @@ col = col + 1
 col = col + 1
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR((F{}-P{})/F{},"")".format(empty_row, empty_row, empty_row)
 Wish_list.cell(row = empty_row, column = col).number_format = percent_format
-
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #Google Analytics Sessions query Column AB
 col = col + 1
@@ -491,21 +510,22 @@ Total_sessions = ga_query(start_date, end_date, filter_var, metrics, dimensions,
 print('\nGA2. Total sessions for the period: ' + Total_sessions)
 
 (Wish_list.cell(row=empty_row, column=col)).value = int(Total_sessions)
-Wish_list.cell(row=empty_row, column=col).number_format = '#,##0'
-
+Wish_list.cell(row=empty_row, column=col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column AC( #user added / sessions calculations )
 col = col + 1
 
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR(E{}/AB{},\"\")".format(empty_row, empty_row)
-Wish_list.cell(row = empty_row, column = col).number_format = '##.###########%'
+Wish_list.cell(row = empty_row, column = col).number_format = '#.#####%'
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------#
 #column space for calculation column AD ( #user growth calculation )
 col = col + 1
 
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR(E{}/E{}-100%,\"\")".format(empty_row, one_year_ago)
 Wish_list.cell(row = empty_row, column = col).number_format = percent_format
-
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 # ---------------------------------------------------------------------------------------------------------------
 #column AE
 col = col + 1
@@ -530,14 +550,15 @@ wl_created
 print('\n9. Wish Lists Created: ' + str(int(wl_created)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(wl_created)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
-
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column AF ( #wishlist growth calculation )
 col = col + 1
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR(AE{}/AE{}-1,\"\")".format(empty_row, one_year_ago)
 Wish_list.cell(row = empty_row, column = col).number_format = percent_format
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #Column AG
 col = col + 1
@@ -566,7 +587,7 @@ print('\n10. Wish List Names Created: ' + str(int(wl_name_created)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(wl_name_created)
 Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
-
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #Column AH
 col = col + 1
@@ -602,6 +623,7 @@ print('\n11. Empty Wish Lists: ' + str(int(wl_empty)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(wl_empty)
 Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column AI
 col = col + 1
@@ -640,8 +662,8 @@ skus_added = skus_added_df.iloc[0][0]
 print('\n13. Skus Added to Wishlists: ' + str(int(skus_added)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(skus_added)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
-
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column AJ( skus / list 7 days  hidden column)
 col = col + 1
@@ -655,11 +677,13 @@ col = col + 1
 
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR(AH{}/AE{},\"\")".format(empty_row, empty_row)
 Wish_list.cell(row = empty_row, column = col).number_format = percent_format
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column AM( sku add growth)
 col = col + 1
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR(AI{}/AI{}-1,"")".format(empty_row, one_year_ago)
 Wish_list.cell(row = empty_row, column = col).number_format = percent_format
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column AN
 col = col + 1
@@ -694,13 +718,14 @@ added_to_named = added_to_named_df.iloc[0] [0]
 print('\n14. Skus Added to Named: ' + str(int(added_to_named)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(added_to_named)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
-
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column AO (Unnamed Calculation)
 col = col + 1
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR(AN{}/AN{}-1,\"\")".format(empty_row, one_year_ago)
 Wish_list.cell(row = empty_row, column = col).number_format = percent_format
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column AP
 col = col + 1
@@ -733,13 +758,14 @@ added_to_loves = added_to_loves_df.iloc[0] [0]
 print('\n15. Skus Added to Loves: ' + str(int(added_to_loves)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(added_to_loves)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
-
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column AQ (Unnamed Calculation)
 col = col + 1
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR(AP{}/AP{}-1,\"\")".format(empty_row, one_year_ago)
 Wish_list.cell(row = empty_row, column = col).number_format = percent_format
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #Column AR
 col = col + 1
@@ -764,14 +790,15 @@ skus_deleted= skus_deleted_df.iloc[0][0]
 print('\n16. Skus Deleted: ' + str(int(skus_deleted)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(skus_deleted)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column AS (skus / customer)
 col = col + 1
 
 (Wish_list.cell(row= empty_row, column = col)).value = "=IFERROR(AI{}/E{},\"\")".format(empty_row, empty_row)
-Wish_list.cell(row = empty_row, column= col).number_format = '#,##0'
-
+Wish_list.cell(row = empty_row, column= col).number_format = '#.## '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column AT tot rev
 col = col + 1
@@ -817,13 +844,14 @@ total_rev = total_revenue_df.iloc[0][0]
 print('\n17. Total Rev: ' + str(int(total_rev)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(total_rev)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
+Wish_list.cell(row = empty_row, column = col).number_format = '$#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column AU (revenue growth calulation)
 col = col + 1
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR(AT{}/AT{}-1,\"\")".format(empty_row, one_year_ago)
 Wish_list.cell(row = empty_row, column = col).number_format = percent_format
-
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #Column AV
 col = col + 1
@@ -871,14 +899,16 @@ print('\n18. Total Skus: ' + str(int(total_sku)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(total_sku)
 Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 # #---------------------------------------------------------------------------------------------------------------
 #column space for calculation column AW (sku conv)
 col = col + 1
 
 (Wish_list.cell(row = empty_row, column = col)).value = "=IFERROR(AV224/(AI224+AI223),"")".format(empty_row, empty_row, (empty_row-1))
 Wish_list.cell(row = empty_row, column= col).number_format = percent_format
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
-
+#Column AX
 col = col + 1
 
 total_rev_sku_count_query = """SELECT sum(output.PRICE) REVENUE, count(output.WLSKUID) SKUS
@@ -907,21 +937,23 @@ rev_moved = total_rev_sku_count_df.iloc[0][0]
 print('\n19. Rev Moved: ' + str(int(rev_moved)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(rev_moved)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
-
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 
 
 #---------------------------------------------------------------------------------------------------------------------
+#Column AY
 col = col + 1
 sku_moved= total_rev_sku_count_df.iloc[0][1]
 
 print('\n20. sku moved: ' + str(int(sku_moved)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(sku_moved)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
-
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 
 #---------------------------------------------------------------------------------------------------------------
+#Column AZ
 col = col + 1
 
 total_rev_sku_count_with_match_query = """SELECT sum(PRICE) REVENUE, count(SKU_IDS) SKUS from
@@ -954,9 +986,10 @@ rev_moved_with_order = total_rev_sku_count_with_match_df.iloc[0][0]
 print('\n20. Rev Moved With Order: ' + str(int(rev_moved_with_order)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(rev_moved_with_order)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
-
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
+#Column BA
 col = col + 1
 sku_moved_with_order = total_rev_sku_count_with_match_df.iloc[0][1]
 
@@ -964,9 +997,10 @@ sku_moved_with_order = total_rev_sku_count_with_match_df.iloc[0][1]
 print('\n21. Rev Moved With Order: ' + str(int(sku_moved_with_order)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(sku_moved_with_order)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
-
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
+#Column BB
 col = col + 1
 
 orders_total_revenue_query = """
@@ -1008,12 +1042,13 @@ orders_total_revenue_df = Query('ugpostgres', orders_total_revenue_query)
 orders_total_revenue = orders_total_revenue_df.iloc[0] [1]
 
 
-print('\n22. Orders total revenue: ' + str(int(orders_total_revenue)))
+print('\n22. Total orders ' + str(int(orders_total_revenue)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(orders_total_revenue)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
-
+Wish_list.cell(row = empty_row, column = col).number_format = '#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 # #---------------------------------------------------------------------------------------------------------------
+#Column BC
 col = col + 1
 AOV_query = """
 SELECT round(sum(order_sku.price * order_sku.quantity) / count(distinct WL_ORDERS.order_id)) AOV,
@@ -1034,10 +1069,11 @@ AOV_query_df = Query('ugpostgres', AOV_query)
 AOV = AOV_query_df.iloc[0][0]
 
 
-print('\n22. AOV: ' + str(int(AOV)))
+print('\n23. AOV: ' + str(int(AOV)))
 
 (Wish_list.cell(row = empty_row, column = col)).value = int(AOV)
-Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
+Wish_list.cell(row = empty_row, column = col).number_format = '$#,##0 '
+Wish_list.cell(row = empty_row, column = col).font = Font(size=12)
 #---------------------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------------------#---------------------------------------------------------------------------------------------------------------
@@ -1071,5 +1107,5 @@ Wish_list.cell(row = empty_row, column = col).number_format = '#,##0'
 
 
 
-RuxWishList.save('/Users/gconnolly/Documents/projects/RUX/RUX_automated.xlsx')
-#RuxWishList.save('/Users/gconnolly/Documents/projects/RUX/test.xlsx')
+#RuxWishList.save('/Users/gconnolly/Documents/projects/RUX/RUX_automated.xlsx')
+RuxWishList.save('/Users/gconnolly/Documents/projects/RUX/test.xlsx')
